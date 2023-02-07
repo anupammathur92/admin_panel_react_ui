@@ -1,14 +1,36 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from "react-router-dom";
+
 import { routeConstants } from '../routeConstants';
+import { checkLogin } from '../services/index';
 
 import logo from "../images/logo.svg";
 import login from "../images/login.jpg";
+
 function Login(){
     const navigate = useNavigate();
+    
+    const [loginDetails, setLoginDetails] = useState({
+        email : '',
+        password: ''
+    });
 
-    const navigateToDashboard = () => {
-        navigate(routeConstants.DASHBOARD);
+    const handleInputChange = (e) => {
+        setLoginDetails({
+            ...loginDetails,
+            [e.target.name] : e.target.value
+        })
+    }
+
+    const handleLogin = () => {
+        if(loginDetails.email!=='' && loginDetails.password!==''){
+            checkLogin(loginDetails).then((resp)=>{
+                if(resp.data.checkLogin.status===true){
+                    //dispatch(doLogin(loginDetails));
+                    navigate(routeConstants.DASHBOARD);
+                }
+            });
+        }
     }
 
     return(
@@ -27,7 +49,7 @@ function Login(){
                             <div className="input-group-prepend">
                                 <span className="input-group-text"><i className="fal fa-envelope"></i></span>
                             </div>
-                            <input type="text" className="form-control" placeholder="Email Address"/>
+                            <input className="form-control" name="email" value={loginDetails.email} onChange={handleInputChange} placeholder="Email Address"/>
                         </div>
                     </div>
                     <div className="form-group">
@@ -36,11 +58,11 @@ function Login(){
                             <div className="input-group-prepend">
                                 <span className="input-group-text"><i className="fal fa-lock"></i></span>
                             </div>
-                            <input type="password" className="form-control" placeholder="Password"/>
+                            <input type="password" className="form-control" name="password" value={loginDetails.password} onChange={handleInputChange} placeholder="Password"/>
                         </div>
                     </div>
                     <div className="form-group mb-0">
-                        <button type="button" onClick={navigateToDashboard} className="btn w-100">Login</button>
+                        <button type="button" onClick={handleLogin} className="btn w-100">Login</button>
                     </div>
                 </form>
             </div>
